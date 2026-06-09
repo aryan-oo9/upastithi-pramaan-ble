@@ -28,6 +28,51 @@ Fraud Score = (BLE Failed × 40) + (Face Failed × 40) + (Code Failed × 20)
 
 ---
 
+## 🔄 How It Works
+
+```mermaid
+flowchart TD
+    A([App Launch]) --> B[Login Screen]
+    B --> C{Select Role}
+
+    C -->|Faculty| D[Faculty Dashboard]
+    C -->|Student| E[Student Dashboard]
+    C -->|Admin| F[Admin Dashboard]
+
+    %% Teacher Flow
+    D --> G[Select Subject & Start Session]
+    G --> H[Session created in Supabase]
+    H --> I[BLE Advertising Started\nDevice broadcasts session beacon]
+    I --> J[Rotating 2FA Code displayed\nUpdates every 40-50 seconds]
+
+    %% Student Flow
+    E --> L[View Active Sessions]
+    L --> M[Select Session to Mark Attendance]
+    M --> N[Step 1 - BLE Proximity Check\nScan for teacher beacon]
+    N --> N1{Near enough?}
+    N1 -->|No| N2[Proximity Failed - 40 Fraud Score]
+    N1 -->|Yes| O[Step 2 - Face Verification\nOn-device MobileFaceNet scan]
+    N2 --> O
+    O --> O1{Face matched?}
+    O1 -->|No| O2[Face Failed - 40 Fraud Score]
+    O1 -->|Yes| P[Step 3 - Enter 2FA Code\nFrom teacher's screen]
+    O2 --> P
+    P --> P1{Code valid?}
+    P1 -->|No| P2[Code Failed - 20 Fraud Score]
+    P1 -->|Yes| Q[All checks done]
+    P2 --> Q
+
+    Q --> R{Online?}
+    R -->|Yes| S[Submit to Supabase\nFraud score recorded]
+    R -->|No| T[Cache locally in Drift DB\nPending sync flag set]
+    T --> U[Network restored\nAuto-sync to Supabase]
+
+    %% Admin
+    F --> V[Manage Faculty, Students and Subjects]
+```
+
+---
+
 ## ✨ Key Features
 
 - 🔌 **Offline-first** — attendance is cached locally in Drift (SQLite) when offline and auto-synced on reconnect
