@@ -45,17 +45,14 @@ flowchart TD
     L --> M[Select Session to Mark Attendance]
     M --> N[Step 1 - BLE Proximity Check\nScan for teacher beacon]
     N --> N1{Near enough?}
-    N1 -->|No| N2[Proximity check not passed]
+    N1 -->|No| DENY1([❌ Attendance Denied\nNot in classroom range])
     N1 -->|Yes| O[Step 2 - Face Verification\nOn-device MobileFaceNet scan]
-    N2 --> O
     O --> O1{Face matched?}
-    O1 -->|No| O2[Face match not confirmed]
+    O1 -->|No| DENY2([❌ Attendance Denied\nIdentity not verified])
     O1 -->|Yes| P[Step 3 - Enter 2FA Code\nFrom teacher's screen]
-    O2 --> P
     P --> P1{Code valid?}
-    P1 -->|No| P2[Code invalid or expired]
-    P1 -->|Yes| Q[All checks done]
-    P2 --> Q
+    P1 -->|No| DENY3([❌ Attendance Denied\nInvalid or expired code])
+    P1 -->|Yes| Q[✅ All 3 checks passed]
 
     Q --> R{Online?}
     R -->|Yes| S[Attendance submitted to Supabase]
