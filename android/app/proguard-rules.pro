@@ -1,0 +1,6 @@
+-keep class org.tensorflow.** { *; }
+-keep class org.tensorflow.lite.** { *; }
+-dontwarn org.tensorflow.**
+-keep class com.google.mlkit.** { *; }
+-dontwarn com.google.mlkit.**
+-keep class com.upastithi.ble.** { *; }
