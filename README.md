@@ -20,11 +20,6 @@
 | 2 | **On-Device Face Match** | MobileFaceNet via TensorFlow Lite | Euclidean distance < 0.45 |
 | 3 | **Rolling 2FA Code** | Server-side rotating 6-char code | Expires every 40–50 seconds |
 
-A **Fraud Score** (0–100) is computed on every attendance submission and stored in Supabase for admin review:
-
-```
-Fraud Score = (BLE Failed × 40) + (Face Failed × 40) + (Code Failed × 20)
-```
 
 ---
 
@@ -50,20 +45,20 @@ flowchart TD
     L --> M[Select Session to Mark Attendance]
     M --> N[Step 1 - BLE Proximity Check\nScan for teacher beacon]
     N --> N1{Near enough?}
-    N1 -->|No| N2[Proximity Failed - 40 Fraud Score]
+    N1 -->|No| N2[Proximity check not passed]
     N1 -->|Yes| O[Step 2 - Face Verification\nOn-device MobileFaceNet scan]
     N2 --> O
     O --> O1{Face matched?}
-    O1 -->|No| O2[Face Failed - 40 Fraud Score]
+    O1 -->|No| O2[Face match not confirmed]
     O1 -->|Yes| P[Step 3 - Enter 2FA Code\nFrom teacher's screen]
     O2 --> P
     P --> P1{Code valid?}
-    P1 -->|No| P2[Code Failed - 20 Fraud Score]
+    P1 -->|No| P2[Code invalid or expired]
     P1 -->|Yes| Q[All checks done]
     P2 --> Q
 
     Q --> R{Online?}
-    R -->|Yes| S[Submit to Supabase\nFraud score recorded]
+    R -->|Yes| S[Attendance submitted to Supabase]
     R -->|No| T[Cache locally in Drift DB\nPending sync flag set]
     T --> U[Network restored\nAuto-sync to Supabase]
 
