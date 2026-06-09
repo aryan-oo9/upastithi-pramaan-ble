@@ -232,39 +232,56 @@ During **enrollment**, 5 captures are averaged to create a robust template store
 ### Local (Drift / SQLite)
 
 #### `student_embeddings`
+Stores each student's face template generated during enrollment.
+
 | Column | Type | Notes |
 |--------|------|-------|
 | `id` | TEXT PK | Student UUID |
 | `student_name` | TEXT | Display name |
 | `student_roll_number` | TEXT (nullable) | University roll number |
 | `embedding` | BLOB | Serialised 128-d face vector |
-| `enrolled_at` | INTEGER | Epoch milliseconds |
+| `enrolled_at` | INTEGER | Enrollment timestamp |
 | `synced` | BOOLEAN | Upload status flag |
 
 #### `attendance_logs`
+Caches attendance records locally when offline — synced to Supabase on reconnect.
+
 | Column | Type | Notes |
 |--------|------|-------|
 | `id` | TEXT PK | Record UUID |
 | `student_id` | TEXT | FK → Student UUID |
 | `session_uuid` | TEXT | Target class session ID |
-| `teacher_name` | TEXT | Cached teacher name |
-| `room_code` | TEXT | Classroom identifier |
 | `proximity_verified` | BOOLEAN | BLE check result |
 | `face_verified` | BOOLEAN | Face match result |
 | `code_verified` | BOOLEAN | 2FA code result |
-| `captured_at` | INTEGER | Epoch milliseconds |
+| `captured_at` | INTEGER | Timestamp |
 | `synced` | BOOLEAN | Upload status flag |
 
 ### Cloud (Supabase PostgreSQL)
 
-| Table | Purpose |
-|-------|---------|
-| `users` | Base user record with `role` and `password_hash` |
-| `students` | Student profile: roll, division, semester, department |
-| `faculty` | Faculty profile: emp_id, name, department |
-| `subjects` | Subject catalogue |
-| `sessions` | Active class sessions with rotating 2FA code |
-| `attendance_records` | Final records with fraud score |
+#### `sessions`
+Core table for active class sessions created by the teacher.
+
+| Column | Notes |
+|--------|-------|
+| `id` | Session UUID |
+| `faculty_id` | FK → faculty |
+| `subject_id` | FK → subjects |
+| `active` | Whether session is ongoing |
+| `twofa_code` | Current rotating 6-char code |
+| `twofa_code_expires_at` | Code expiry timestamp |
+
+#### `attendance_records`
+Final verified attendance records pushed from the app.
+
+| Column | Notes |
+|--------|-------|
+| `session_id` | FK → sessions |
+| `student_id` | FK → students |
+| `ble_verified` | BLE proximity passed |
+| `face_verified` | Face match passed |
+| `mac_verified` | 2FA code passed |
+| `marked_at` | Submission timestamp |
 
 ---
 
