@@ -85,12 +85,12 @@ flowchart TD
 ┌─────────────────────────────────────────────────────────────────┐
 │                        Flutter / Dart Layer                     │
 │                                                                 │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────┐   │
-│  │  Auth    │  │ Student  │  │ Teacher  │  │    Admin     │   │
-│  │ Feature  │  │ Feature  │  │ Feature  │  │   Feature    │   │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └──────┬───────┘   │
-│       │              │              │               │            │
-│  ┌────▼──────────────▼──────────────▼───────────────▼───────┐  │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────────┐     │
+│  │  Auth    │  │ Student  │  │ Teacher  │  │    Admin     │     │
+│  │ Feature  │  │ Feature  │  │ Feature  │  │   Feature    │     │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └──────┬───────┘     │
+│       │             │             │               │             │
+│  ┌────▼─────────────▼─────────────▼───────────────▼──────────┐  │
 │  │              Services (Riverpod Providers)                │  │
 │  │  AuthService · SessionService · FaceMLService · BleService│  │
 │  └──────────────────────────┬────────────────────────────────┘  │
@@ -107,7 +107,7 @@ flowchart TD
                               │
 ┌─────────────────────────────▼───────────────────────────────────┐
 │               Native Android / Kotlin Layer                     │
-│   MainActivity.kt · BleAdvertiser.kt · BleScanner.kt           │
+│   MainActivity.kt · BleAdvertiser.kt · BleScanner.kt            │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
